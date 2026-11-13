@@ -6,7 +6,11 @@ const undoBtn = document.getElementById('undo');
 const newBtn = document.getElementById('new');
 
 const game = new Game();
-const NAMES = { 1: 'Yellow', 2: 'White' };
+const worker = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
+
+let humanPlayer = 2;   // 1 = moves first
+let thinking = false;
+let requestId = 0;
 
 // ---------- board ----------
 const columns = [];
@@ -22,16 +26,16 @@ for (let c = 0; c < COLS; c++) {
     col.append(cell);
     cells[r] = cell;
   }
-  col.addEventListener('click', () => move(c));
+  col.addEventListener('click', () => humanMove(c));
   boardEl.append(col);
   columns.push({ el: col, cells });
 }
 
 function drawStone(c, r, player, animate) {
   const stone = document.createElement('div');
-  stone.className = `stone ${player === 1 ? 'p-you' : 'p-ai'}`;
+  stone.className = `stone ${player === humanPlayer ? 'p-you' : 'p-ai'}`;
   if (animate) {
-    const fall = ROWS - r; 
+    const fall = ROWS - r;
     stone.style.setProperty('--fall', fall);
     stone.style.setProperty('--t', `${140 + 40 * fall}ms`);
     stone.classList.add('drop');
@@ -53,36 +57,84 @@ function markWin() {
   for (const [c, r] of game.winLine) columns[c].cells[r].querySelector('.stone')?.classList.add('win');
 }
 
-function update() {
-  columns.forEach(({ el, cells }, c) => {
-    el.disabled = !game.canPlay(c);
+// Hover over the cell where the next stone would land 
+function markNext() {
+  for (let c = 0; c < COLS; c++) {
     const h = game.height(c);
-    cells.forEach((cell, r) => cell.classList.toggle('next', r === h)); // hover preview
-  });
-  undoBtn.disabled = game.moves.length === 0;
+    columns[c].cells.forEach((cell, r) => cell.classList.toggle('next', r === h));
+  }
+}
 
-  if (game.winner) statusEl.textContent = `${NAMES[game.winner]} wins.`;
+function update() {
+  const humanTurn = !game.isOver && game.turn === humanPlayer && !thinking;
+  columns.forEach(({ el }, c) => { el.disabled = !humanTurn || !game.canPlay(c); });
+  undoBtn.disabled = thinking || !game.moves.split('').some((_, i) => i % 2 === humanPlayer - 1);
+  markNext();
+
+  statusEl.classList.toggle('thinking', thinking);
+  if (game.winner) statusEl.textContent = game.winner === humanPlayer ? 'You win. Well played.' : 'AI wins.';
   else if (game.isDraw) statusEl.textContent = 'Draw.';
-  else statusEl.textContent = `${NAMES[game.turn]} to move`;
+  else if (thinking) statusEl.textContent = 'AI is thinking';
+  else statusEl.textContent = 'Your move';
 }
 
 // ---------- moves ----------
-function move(c) {
-  if (!game.canPlay(c)) return;
+function play(c) {
   const player = game.turn;
   const r = game.play(c);
   drawStone(c, r, player, true);
   markWin();
+}
+
+function humanMove(c) {
+  if (thinking || game.isOver || game.turn !== humanPlayer || !game.canPlay(c)) return;
+  play(c);
+  if (!game.isOver) askAI();
   update();
 }
 
-undoBtn.addEventListener('click', () => { game.undo(); redraw(); });
-newBtn.addEventListener('click', () => { game.reset(); redraw(); });
+function askAI() {
+  thinking = true;
+  update();
+  worker.postMessage({ type: 'move', id: ++requestId, moves: game.moves });
+}
+
+worker.onmessage = ({ data }) => {
+  if (data.id !== requestId) return;
+  thinking = false;
+  play(data.col);
+  update();
+};
+
+worker.onerror = () => {
+  thinking = false;
+  statusEl.textContent = 'The AI failed to load. Reload the page to try again.';
+};
+
+// ---------- controls ----------
+function newGame() {
+  requestId++;
+  thinking = false;
+  humanPlayer = document.querySelector('input[name="first"]:checked').value === 'human' ? 1 : 2;
+  game.reset();
+  redraw();
+  if (humanPlayer === 2) askAI();
+}
+
+undoBtn.addEventListener('click', () => {
+  if (thinking) return;
+  if (game.moves.length && (game.moves.length % 2 === 0 ? 2 : 1) !== humanPlayer) game.undo();
+  game.undo();
+  redraw();
+});
+
+newBtn.addEventListener('click', newGame);
+document.querySelectorAll('input[name="first"]').forEach(i => i.addEventListener('change', newGame));
 
 document.addEventListener('keydown', e => {
   if (e.altKey || e.ctrlKey || e.metaKey) return;
   const n = Number(e.key);
-  if (n >= 1 && n <= COLS) move(n - 1);
+  if (n >= 1 && n <= COLS) humanMove(n - 1);
 });
 
-redraw();
+newGame();
