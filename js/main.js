@@ -11,6 +11,8 @@ const worker = new Worker(new URL('./worker.js', import.meta.url), { type: 'modu
 let humanPlayer = 2;   // 1 = moves first
 let thinking = false;
 let requestId = 0;
+let level = 'medium'; // easy,medium,unbeatable
+let askedAt = 0;
 
 // ---------- board ----------
 const columns = [];
@@ -79,6 +81,7 @@ function update() {
 }
 
 // ---------- moves ----------
+
 function play(c) {
   const player = game.turn;
   const r = game.play(c);
@@ -96,14 +99,19 @@ function humanMove(c) {
 function askAI() {
   thinking = true;
   update();
-  worker.postMessage({ type: 'move', id: ++requestId, moves: game.moves });
+  askedAt = performance.now();
+  worker.postMessage({ type: 'move', id: ++requestId, moves: game.moves, level });
 }
 
 worker.onmessage = ({ data }) => {
   if (data.id !== requestId) return;
-  thinking = false;
-  play(data.col);
-  update();
+  const wait = Math.max(0, 500 - (performance.now() - askedAt));
+  setTimeout(() => {
+    if (data.id !== requestId) return;
+    thinking = false;
+    play(data.col);
+    update();
+  }, wait);
 };
 
 worker.onerror = () => {
@@ -116,6 +124,7 @@ function newGame() {
   requestId++;
   thinking = false;
   humanPlayer = document.querySelector('input[name="first"]:checked').value === 'human' ? 1 : 2;
+  level = document.querySelector('input[name="level"]:checked').value;
   game.reset();
   redraw();
   if (humanPlayer === 2) askAI();
@@ -129,7 +138,7 @@ undoBtn.addEventListener('click', () => {
 });
 
 newBtn.addEventListener('click', newGame);
-document.querySelectorAll('input[name="first"]').forEach(i => i.addEventListener('change', newGame));
+document.querySelectorAll('input[name="first"], input[name="level"]').forEach(i => i.addEventListener('change', newGame));
 
 document.addEventListener('keydown', e => {
   if (e.altKey || e.ctrlKey || e.metaKey) return;

@@ -20,10 +20,16 @@
       <div class="board" id="board" role="group" aria-label="Board, 7 columns. Press 1 to 7 to drop a stone."></div>
       <p class="status" id="status" role="status" aria-live="polite"></p>
 
+      <fieldset class="segmented level">
+        <legend>Difficulty</legend>
+        <label><input type="radio" name="level" value="easy"> Easy</label>
+        <label><input type="radio" name="level" value="medium" checked> Medium</label>
+        <label title="Coming soon"><input type="radio" name="level" value="unbeatable" disabled> Unbeatable <span class="soon">#TODO</span></label>
+      </fieldset>
       <div class="controls">
-        <fieldset class="first">
-          <legend>Who moves first?</legend>
-          <label><input type="radio" name="first" value="ai" checked> Bot </label>
+        <fieldset class="segmented first">
+          <legend>Who moves first</legend>
+          <label><input type="radio" name="first" value="ai" checked> AI</label>
           <label><input type="radio" name="first" value="human"> You</label>
         </fieldset>
         <button type="button" id="undo">Undo</button>

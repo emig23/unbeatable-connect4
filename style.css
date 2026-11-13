@@ -22,13 +22,13 @@ body {
   font-size: 1.0625rem;
   line-height: 1.5;
 }
-
+ 
 main {
   width: min(100% - 2rem, calc(var(--cell) * 7 + 1.5rem));
   margin: 0 auto;
   padding: 2.5rem 0 4rem;
 }
-
+ 
 h1 {
   font-size: clamp(2rem, 6vw, 3rem);
   font-weight: 800;
@@ -37,9 +37,9 @@ h1 {
   margin: 0 0 0.5rem;
   font-variation-settings: "opsz" 96;
 }
-
+ 
 .lede { margin: 0 0 2rem; color: var(--muted); max-width: 34em; }
-
+ 
 /* ---------- board ---------- */
 .analysis {
   width: fit-content;
@@ -56,7 +56,7 @@ h1 {
 .analysis .good { color: var(--slab); font-weight: 600; }
 .analysis .chosen { color: var(--ink); font-weight: 800; }
 .analysis[hidden] { visibility: hidden; display: grid; }
-
+ 
 .board {
   width: fit-content;
   display: grid;
@@ -68,7 +68,7 @@ h1 {
   overflow: hidden;
   touch-action: manipulation;
 }
-
+ 
 .col {
   display: grid;
   grid-template-rows: repeat(6, var(--cell));
@@ -90,7 +90,7 @@ h1 {
   border: 3px dashed var(--you);
   opacity: 0.8;
 }
-
+ 
 .cell { position: relative; display: grid; place-items: center; }
 .cell::before { /* the hole */
   content: "";
@@ -100,7 +100,7 @@ h1 {
   background: var(--paper);
   box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.18);
 }
-
+ 
 .stone {
   position: absolute;
   inset: 9%;
@@ -113,10 +113,10 @@ h1 {
 .stone.win { outline: 4px solid var(--ink); outline-offset: 3px; }
 .stone.p-you.win { outline-color: var(--ink); }
 .stone.p-ai.win { outline-color: var(--you); }
-
+ 
 @keyframes drop { from { transform: translateY(calc(var(--fall) * -100% - 40%)); } to { transform: translateY(0); } }
 @keyframes settle { 40% { transform: translateY(-6%); } 100% { transform: translateY(0); } }
-
+ 
 /* ---------- status and controls ---------- */
 .status {
   font-size: 1.35rem;
@@ -135,10 +135,10 @@ h1 {
   animation: pulse 900ms ease-in-out infinite alternate;
 }
 @keyframes pulse { to { transform: translateY(-4px); } }
-
+ 
 .controls { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
-
-fieldset.first {
+ 
+fieldset.segmented {
   display: inline-flex;
   margin: 0;
   padding: 3px;
@@ -146,13 +146,26 @@ fieldset.first {
   background: #c8d2cf;
   border-radius: 999px;
 }
-fieldset.first legend { float: left; padding: 0.4rem 0.6rem 0 0.75rem; font-size: 0.9rem; color: var(--muted); }
-fieldset.first label { position: relative; }
-fieldset.first input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
-fieldset.first label { padding: 0.4rem 0.95rem; border-radius: 999px; font-weight: 600; cursor: pointer; }
-fieldset.first label:has(input:checked) { background: var(--slab); color: #fff; }
-fieldset.first label:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 1px; }
-
+fieldset.segmented legend { float: left; padding: 0.4rem 0.6rem 0 0.75rem; font-size: 0.9rem; color: var(--muted); }
+fieldset.segmented label { position: relative; }
+fieldset.segmented input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+fieldset.segmented label { padding: 0.4rem 0.95rem; border-radius: 999px; font-weight: 600; cursor: pointer; }
+fieldset.segmented label:has(input:checked) { background: var(--slab); color: #fff; }
+fieldset.segmented label:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 1px; }
+fieldset.segmented label:has(input:disabled) { color: var(--muted); cursor: not-allowed; }
+fieldset.segmented input:disabled { cursor: not-allowed; }
+.soon {
+  margin-left: 0.3rem;
+  padding: 0.05rem 0.45rem;
+  border-radius: 999px;
+  border: 1.5px solid currentColor;
+  font-size: 0.72rem;
+  font-weight: 600;
+  vertical-align: 0.1em;
+}
+fieldset.level { margin-bottom: 0.75rem; }
+fieldset.segmented label { white-space: nowrap; }
+ 
 .controls button {
   font: inherit;
   font-weight: 600;
@@ -167,24 +180,36 @@ fieldset.first label:has(input:focus-visible) { outline: 3px solid var(--focus);
 .controls button:hover:not(:disabled) { background: var(--slab-edge); border-color: var(--slab-edge); color: #fff; }
 .controls button:disabled { opacity: 0.45; cursor: default; }
 .controls button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
-
+ 
 .toggle { display: inline-flex; gap: 0.5rem; margin-top: 1rem; font-size: 0.95rem; color: var(--muted); cursor: pointer; }
 .toggle input { accent-color: var(--slab); }
-
+ 
 /* ---------- about ---------- */
+ 
 .about { margin-top: 3.5rem; max-width: 36em; }
 .about h2 { font-size: 1.25rem; margin: 0 0 0.5rem; }
 .about p { margin: 0 0 0.8rem; color: var(--muted); }
 .about a { color: var(--ink); font-weight: 600; }
-
+ 
 @media (max-width: 560px) {
   main { padding-top: 1.5rem; }
   .board { padding: 0.5rem; border-radius: 14px; }
   .analysis { padding: 0 0.5rem; font-size: 0.68rem; }
   .controls button.primary { margin-left: 0; }
+  /* Easy / Medium / Unbeatable explain themselves; keep the legend for
+     screen readers only so the pill fits on narrow screens. */
+  fieldset.level legend {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap;
+  }
+  fieldset.segmented label { padding: 0.4rem 0.8rem; }
 }
-
+ 
 @media (prefers-reduced-motion: reduce) {
   .stone.drop { animation: none; }
   .status.thinking::after { animation: none; }
+}
+ 
+@media (max-width: 370px) {
+  .soon { display: none; }
 }
