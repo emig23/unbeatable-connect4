@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connect 4</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <header class="masthead">
+      <h1>Connect 4</h1>
+      <p class="lede">Get four in a row to win</p>
+    </header>
+
+    <section class="play" aria-label="Game">
+      <div class="board" id="board" role="group" aria-label="Board, 7 columns. Press 1 to 7 to drop a stone."></div>
+      <p class="status" id="status" role="status" aria-live="polite"></p>
+
+      <div class="controls">
+        <button type="button" id="undo">Undo</button>
+        <button type="button" id="new" class="primary">New game</button>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
