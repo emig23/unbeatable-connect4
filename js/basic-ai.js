@@ -77,10 +77,9 @@ export class BasicAI {
           if (score > alpha) alpha = score;
         }
         bestCol = col; depthReached = depth;
-        if (best >= WIN - 42) break; // found a forced win, no need to look deeper
+        if (best >= WIN - 42) break; 
       } catch (e) {
         if (e !== TIMEOUT) throw e;
-        // Restore the board: the timed-out search left moves on it.
         while (game.moves.length > moves.length) game.undo();
         break;
       }
