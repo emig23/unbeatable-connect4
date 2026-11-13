@@ -1,17 +1,10 @@
-// Phase 2 AI: negamax with alpha-beta pruning on the plain board.
-//
-// It looks a fixed number of moves ahead, then scores the position with a
-// simple rule of thumb (open threes, open twos, center stones). Strong
-// against casual play, but not perfect: past its search depth it guesses.
+// AI: negamax with alpha-beta pruning on the plain board.
 
 import { Game, COLS, ROWS } from './game.js';
 
-// Center columns first: they belong to the most four-in-a-row lines, and
-// good moves searched first let alpha-beta skip more of the tree.
 const ORDER = [3, 2, 4, 1, 5, 0, 6];
 const WIN = 100000;
 
-// All 69 lines of four cells on the board.
 const WINDOWS = [];
 for (let c = 0; c < COLS; c++) {
   for (let r = 0; r < ROWS; r++) {
@@ -22,7 +15,7 @@ for (let c = 0; c < COLS; c++) {
   }
 }
 
-// Score from the point of view of `player`.
+// Score from the point of view of `player 
 export function evaluate(game, player) {
   const opp = 3 - player;
   let score = 0;
@@ -32,7 +25,7 @@ export function evaluate(game, player) {
       const v = game.grid[x][y];
       if (v === player) mine++; else if (v === opp) theirs++;
     }
-    if (mine && theirs) continue; // blocked line, worth nothing
+    if (mine && theirs) continue; 
     if (mine === 3) score += 5; else if (mine === 2) score += 2;
     if (theirs === 3) score -= 5; else if (theirs === 2) score -= 2;
   }
@@ -47,7 +40,7 @@ export class BasicAI {
 
   negamax(game, depth, alpha, beta) {
     this.nodes++;
-    if (game.winner) return -(WIN - game.moves.length); // previous player just won
+    if (game.winner) return -(WIN - game.moves.length);
     if (game.isDraw) return 0;
     if (depth === 0) return evaluate(game, game.turn);
     if (performance.now() > this.deadline) throw TIMEOUT;
@@ -60,13 +53,11 @@ export class BasicAI {
       game.undo();
       if (score > best) best = score;
       if (score > alpha) alpha = score;
-      if (alpha >= beta) break; // opponent will never allow this line
+      if (alpha >= beta) break; 
     }
     return best;
   }
 
-  // Iterative deepening: search 1, 2, 3... moves ahead until time runs out,
-  // keeping the answer from the deepest search that finished.
   chooseMove(moves, { budgetMs = 1000, maxDepth = 42 } = {}) {
     const game = new Game();
     for (const ch of moves) game.play(Number(ch) - 1);
