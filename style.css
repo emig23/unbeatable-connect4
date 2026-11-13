@@ -4,9 +4,9 @@
   --slab-edge: #172b27;
   --ink: #14231f;
   --muted: #4f625d;
-  --you: #FDFD96;        
+  --you: #f0b429;        
   --you-edge: #c98d0c;
-  --ai: #AA4344;         
+  --ai: #FF0000;         
   --ai-edge: #8B0000;
   --focus: #f0b429;
   --cell: min(12vw, 76px);
@@ -18,7 +18,7 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: "Lucida Console", "Courier New", monospace;
+  font-family: "Bricolage Grotesque", system-ui, sans-serif;
   font-size: 1.0625rem;
   line-height: 1.5;
 }
@@ -41,7 +41,6 @@ h1 {
 .lede { margin: 0 0 2rem; color: var(--muted); max-width: 34em; }
 
 /* ---------- board ---------- */
-
 .analysis {
   width: fit-content;
   display: grid;
@@ -119,7 +118,6 @@ h1 {
 @keyframes settle { 40% { transform: translateY(-6%); } 100% { transform: translateY(0); } }
 
 /* ---------- status and controls ---------- */
-
 .status {
   font-size: 1.35rem;
   font-weight: 600;
@@ -174,7 +172,6 @@ fieldset.first label:has(input:focus-visible) { outline: 3px solid var(--focus);
 .toggle input { accent-color: var(--slab); }
 
 /* ---------- about ---------- */
-
 .about { margin-top: 3.5rem; max-width: 36em; }
 .about h2 { font-size: 1.25rem; margin: 0 0 0.5rem; }
 .about p { margin: 0 0 0.8rem; color: var(--muted); }
