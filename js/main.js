@@ -11,7 +11,7 @@ const worker = new Worker(new URL('./worker.js', import.meta.url), { type: 'modu
 let humanPlayer = 2;   // 1 = moves first
 let thinking = false;
 let requestId = 0;
-let level = 'medium'; // easy,medium,unbeatable
+let level = 'medium'; // 'easy' | 'medium' | 'unbeatable'
 let askedAt = 0;
 
 // ---------- board ----------
@@ -59,7 +59,7 @@ function markWin() {
   for (const [c, r] of game.winLine) columns[c].cells[r].querySelector('.stone')?.classList.add('win');
 }
 
-// Hover over the cell where the next stone would land 
+// Mark the cell where the next stone would land (for the hover preview).
 function markNext() {
   for (let c = 0; c < COLS; c++) {
     const h = game.height(c);
@@ -81,7 +81,6 @@ function update() {
 }
 
 // ---------- moves ----------
-
 function play(c) {
   const player = game.turn;
   const r = game.play(c);
@@ -104,7 +103,8 @@ function askAI() {
 }
 
 worker.onmessage = ({ data }) => {
-  if (data.id !== requestId) return;
+  if (data.id !== requestId) return; // stale answer after undo / new game
+  // Easy answers almost instantly; wait a moment so the move doesn't feel abrupt.
   const wait = Math.max(0, 500 - (performance.now() - askedAt));
   setTimeout(() => {
     if (data.id !== requestId) return;
