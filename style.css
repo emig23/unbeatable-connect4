@@ -13,7 +13,7 @@
 }
 
 * { box-sizing: border-box; }
-
+ 
 body {
   margin: 0;
   background: var(--paper);
@@ -154,15 +154,6 @@ fieldset.segmented label:has(input:checked) { background: var(--slab); color: #f
 fieldset.segmented label:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 1px; }
 fieldset.segmented label:has(input:disabled) { color: var(--muted); cursor: not-allowed; }
 fieldset.segmented input:disabled { cursor: not-allowed; }
-.soon {
-  margin-left: 0.3rem;
-  padding: 0.05rem 0.45rem;
-  border-radius: 999px;
-  border: 1.5px solid currentColor;
-  font-size: 0.72rem;
-  font-weight: 600;
-  vertical-align: 0.1em;
-}
 fieldset.level { margin-bottom: 0.75rem; }
 fieldset.segmented label { white-space: nowrap; }
  
@@ -185,7 +176,6 @@ fieldset.segmented label { white-space: nowrap; }
 .toggle input { accent-color: var(--slab); }
  
 /* ---------- about ---------- */
- 
 .about { margin-top: 3.5rem; max-width: 36em; }
 .about h2 { font-size: 1.25rem; margin: 0 0 0.5rem; }
 .about p { margin: 0 0 0.8rem; color: var(--muted); }
@@ -210,6 +200,3 @@ fieldset.segmented label { white-space: nowrap; }
   .status.thinking::after { animation: none; }
 }
  
-@media (max-width: 370px) {
-  .soon { display: none; }
-}
