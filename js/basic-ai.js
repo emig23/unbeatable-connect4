@@ -1,4 +1,4 @@
-// AI: negamax with alpha-beta pruning on the plain board.
+// negamax with alpha-beta pruning on the plain board
 
 import { Game, COLS, ROWS } from './game.js';
 
@@ -14,7 +14,7 @@ for (let c = 0; c < COLS; c++) {
     }
   }
 }
- 
+
 export function evaluate(game, player) {
   const opp = 3 - player;
   let score = 0;
@@ -33,26 +33,27 @@ export function evaluate(game, player) {
   }
   return score;
 }
- 
+
 // Difficulty settings.
-//   easy:   looks 2 moves ahead , then picks at random among moves that score close to the best one.
+//   easy:   looks 2 moves ahead (sees immediate wins and blocks), then picks
+//           at random among moves that score close to the best one.
 //   medium: looks as deep as it can in 1 second (about 9 moves).
 export const LEVELS = {
   easy: { maxDepth: 2, slack: 6 },
   medium: { budgetMs: 1000 },
 };
- 
+
 export class BasicAI {
   // `random` can be replaced in tests to make the easy level repeatable.
   constructor({ random = Math.random } = {}) { this.nodes = 0; this.random = random; }
- 
+
   negamax(game, depth, alpha, beta) {
     this.nodes++;
-    if (game.winner) return -(WIN - game.moves.length); // previous player just won
+    if (game.winner) return -(WIN - game.moves.length); 
     if (game.isDraw) return 0;
     if (depth === 0) return evaluate(game, game.turn);
     if (performance.now() > this.deadline) throw TIMEOUT;
- 
+
     let best = -Infinity;
     for (const c of ORDER) {
       if (!game.canPlay(c)) continue;
@@ -65,21 +66,21 @@ export class BasicAI {
     }
     return best;
   }
- 
-  chooseMove(moves, { budgetMs = 1000, maxDepth = 42, slack = 0 } = {}) {
+
+  chooseMove(moves, { budgetMs = 1000, maxDepth = 42, slack = 0, allowed = null } = {}) {
     const game = new Game();
     for (const ch of moves) game.play(Number(ch) - 1);
     this.nodes = 0;
     this.deadline = performance.now() + budgetMs;
- 
-    let bestCol = ORDER.find(c => game.canPlay(c)), depthReached = 0;
+
+    const roots = ORDER.filter(c => game.canPlay(c) && (!allowed || allowed.includes(c)));
+    let bestCol = roots[0], depthReached = 0;
     let scores = {};
     for (let depth = 1; depth <= Math.min(maxDepth, 42 - game.moves.length); depth++) {
       try {
         let best = -Infinity, col = bestCol, alpha = -Infinity;
         const found = {};
-        for (const c of ORDER) {
-          if (!game.canPlay(c)) continue;
+        for (const c of roots) {
           game.play(c);
           const score = -this.negamax(game, depth - 1, -Infinity, slack ? Infinity : -alpha);
           game.undo();
@@ -88,7 +89,7 @@ export class BasicAI {
           if (score > alpha) alpha = score;
         }
         bestCol = col; depthReached = depth; scores = found;
-        if (best >= WIN - 42) break; 
+        if (best >= WIN - 42) break; // found a forced win, no need to look deeper
       } catch (e) {
         if (e !== TIMEOUT) throw e;
         while (game.moves.length > moves.length) game.undo();
@@ -103,6 +104,5 @@ export class BasicAI {
     return { col: bestCol, depth: depthReached, nodes: this.nodes };
   }
 }
- 
+
 const TIMEOUT = new Error('timeout');
- 
