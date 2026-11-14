@@ -3,20 +3,39 @@
 import { Position, Solver, TIMEOUT, COLUMN_ORDER, WIDTH } from './solver.js';
 import { BasicAI } from './basic-ai.js';
 
+export class Book {
+  constructor(json) {
+    this.map = new Map();
+    for (const item of json?.data ? json.data.split(',') : []) {
+      this.map.set(item.slice(0, -1), Number(item.slice(-1)));
+    }
+  }
+  get size() { return this.map.size; }
+  get(p) {
+    const k = p.key(), m = p.mirrorKey();
+    const col = this.map.get((k <= m ? k : m).toString(36));
+    if (col === undefined) return undefined;
+    return k <= m ? col : WIDTH - 1 - col; // mirror the answer back
+  }
+}
+
 export class AI {
-  constructor({ ttSize } = {}) {
+  constructor({ ttSize, book = new Book() } = {}) {
+    this.book = book;
     this.solver = new Solver(ttSize);
     this.fallback = new BasicAI();
   }
 
-  // Returns { col, method, weak, exact }. weak[c] is 1 / 0 / -1 (AI wins /
-  // draw / AI loses) and exact[c] the exact score, from the AI's point of
-  // view; null where unknown.
   chooseMove(p, { budgetMs = 2500, fallbackMs = 1000, solverFrom = 6 } = {}) {
     const playable = COLUMN_ORDER.filter(c => p.canPlay(c));
 
     for (const c of playable) {
       if (p.isWinningMove(c)) return { col: c, method: 'win' };
+    }
+
+    const fromBook = this.book.get(p);
+    if (fromBook !== undefined && p.canPlay(fromBook)) {
+      return { col: fromBook, method: 'book', weak: null, exact: null };
     }
 
     if (p.moves < solverFrom) {
@@ -64,7 +83,6 @@ export class AI {
     }
 
     s.deadline = 0;
-    // Out of time, but we know the best class of move. Pick one of those, or fall back to the heuristic if none are known.
     if (bestClass === 0) {
       return { col: known.find(c => weak[c] === 0), method: 'solver', weak, exact: null };
     }
