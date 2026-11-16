@@ -150,6 +150,44 @@ h1 {
 .start:focus-visible { outline: 4px solid var(--focus); outline-offset: 4px; }
 .start[hidden] { display: none; }
 
+.turn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1.1rem 0 1rem;
+  padding: 0.3rem 0.3rem 0.3rem 0.35rem;
+  background: var(--slab);
+  border-radius: 999px;
+  box-shadow: inset 0 -3px 0 var(--slab-edge);
+}
+.turn .status {
+  margin: 0;
+  min-height: 0;
+  padding: 0.15rem 0.75rem;
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 800;
+  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.turn .status.thinking::after { display: none; }
+.turn-stone {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: none;
+  border-radius: 50%;
+}
+.turn[data-who="none"] .turn-stone { display: none; }
+.turn[data-who="you"] .turn-stone { background: var(--you); box-shadow: inset 0 -3px 0 var(--you-edge); }
+.turn[data-who="ai"] .turn-stone { background: var(--ai); box-shadow: inset 0 -3px 0 var(--ai-edge); }
+.turn.thinking .turn-stone { animation: pulse 900ms ease-in-out infinite alternate; }
+@media (prefers-reduced-motion: reduce) {
+  .turn.thinking .turn-stone { animation: none; }
+}
+
 /* ---------- status and controls ---------- */
 .status {
   font-size: 1.35rem;

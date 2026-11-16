@@ -3,6 +3,7 @@ import { winLabel } from './labels.js';
 
 const boardEl = document.getElementById('board');
 const statusEl = document.getElementById('status');
+const turnEl = document.getElementById('turn');
 const undoBtn = document.getElementById('undo');
 const newBtn = document.getElementById('new');
 const countEl = document.getElementById('ai-count');
@@ -81,8 +82,12 @@ function update() {
   if (!started) statusEl.textContent = 'Press play to start';
   else if (game.winner) statusEl.textContent = game.winner === humanPlayer ? 'You win. Well played.' : 'AI wins.';
   else if (game.isDraw) statusEl.textContent = 'Draw.';
-  else if (thinking) statusEl.textContent = 'AI is thinking';
-  else statusEl.textContent = 'Your move';
+  else if (thinking) statusEl.textContent = "AI's turn";
+  else statusEl.textContent = 'Your turn';
+  // Stone in the turn indicator: whoever moves next (none before play or after the game).
+  const playing = started && !game.isOver;
+  turnEl.dataset.who = !playing ? 'none' : game.turn === humanPlayer && !thinking ? 'you' : 'ai';
+  turnEl.classList.toggle('thinking', thinking);
 }
 
 // ---------- moves ----------
