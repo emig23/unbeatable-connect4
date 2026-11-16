@@ -6,6 +6,7 @@ const statusEl = document.getElementById('status');
 const undoBtn = document.getElementById('undo');
 const newBtn = document.getElementById('new');
 const countEl = document.getElementById('ai-count');
+const startBtn = document.getElementById('start');
 
 const game = new Game();
 const worker = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
@@ -15,6 +16,7 @@ let thinking = false;
 let requestId = 0;
 let level = 'medium'; // 'easy' | 'medium' | 'unbeatable'
 let askedAt = 0;
+let started = false; // false until the play button is pressed
 
 // ---------- board ----------
 const columns = [];
@@ -70,13 +72,14 @@ function markNext() {
 }
 
 function update() {
-  const humanTurn = !game.isOver && game.turn === humanPlayer && !thinking;
+  const humanTurn = started && !game.isOver && game.turn === humanPlayer && !thinking;
   columns.forEach(({ el }, c) => { el.disabled = !humanTurn || !game.canPlay(c); });
   undoBtn.disabled = thinking || !game.moves.split('').some((_, i) => i % 2 === humanPlayer - 1);
   markNext();
 
   statusEl.classList.toggle('thinking', thinking);
-  if (game.winner) statusEl.textContent = game.winner === humanPlayer ? 'You win. Well played.' : 'AI wins.';
+  if (!started) statusEl.textContent = 'Press play to start';
+  else if (game.winner) statusEl.textContent = game.winner === humanPlayer ? 'You win. Well played.' : 'AI wins.';
   else if (game.isDraw) statusEl.textContent = 'Draw.';
   else if (thinking) statusEl.textContent = 'AI is thinking';
   else statusEl.textContent = 'Your move';
@@ -91,7 +94,7 @@ function play(c) {
 }
 
 function humanMove(c) {
-  if (thinking || game.isOver || game.turn !== humanPlayer || !game.canPlay(c)) return;
+  if (!started || thinking || game.isOver || game.turn !== humanPlayer || !game.canPlay(c)) return;
   play(c);
   if (!game.isOver) askAI();
   update();
@@ -123,14 +126,23 @@ worker.onerror = () => {
 };
 
 // ---------- controls ----------
+// New game, or a changed setting: clear the board and wait for the play button.
 function newGame() {
   requestId++;
   thinking = false;
-  humanPlayer = document.querySelector('input[name="first"]:checked').value === 'human' ? 1 : 2;
-  level = document.querySelector('input[name="level"]:checked').value;
+  started = false;
+  startBtn.hidden = false;
   game.reset();
   countEl.textContent = '';
   redraw();
+}
+
+function startGame() {
+  humanPlayer = document.querySelector('input[name="first"]:checked').value === 'human' ? 1 : 2;
+  level = document.querySelector('input[name="level"]:checked').value;
+  started = true;
+  startBtn.hidden = true;
+  update();
   if (humanPlayer === 2) askAI();
 }
 
@@ -143,6 +155,7 @@ undoBtn.addEventListener('click', () => {
 });
 
 newBtn.addEventListener('click', newGame);
+startBtn.addEventListener('click', startGame);
 document.querySelectorAll('input[name="first"], input[name="level"]').forEach(i => i.addEventListener('change', newGame));
 
 document.addEventListener('keydown', e => {
