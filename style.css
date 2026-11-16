@@ -56,6 +56,17 @@ h1 {
 .analysis .good { color: var(--slab); font-weight: 600; }
 .analysis .chosen { color: var(--ink); font-weight: 800; }
 .analysis[hidden] { visibility: hidden; display: grid; }
+.ai-count {
+  min-height: 1.5rem;
+  margin: 0 0 0.4rem;
+  text-align: right;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+@media (max-width: 560px) {
+  .ai-count { margin-right: 0.5rem; } /* the board has less padding here */
+}
  
 .board {
   width: fit-content;
@@ -199,4 +210,3 @@ fieldset.segmented label { white-space: nowrap; }
   .stone.drop { animation: none; }
   .status.thinking::after { animation: none; }
 }
- 

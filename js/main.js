@@ -1,9 +1,11 @@
 import { Game, COLS, ROWS } from './game.js';
+import { winLabel } from './labels.js';
 
 const boardEl = document.getElementById('board');
 const statusEl = document.getElementById('status');
 const undoBtn = document.getElementById('undo');
 const newBtn = document.getElementById('new');
+const countEl = document.getElementById('ai-count');
 
 const game = new Game();
 const worker = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
@@ -109,6 +111,7 @@ worker.onmessage = ({ data }) => {
   setTimeout(() => {
     if (data.id !== requestId) return;
     thinking = false;
+    countEl.textContent = winLabel(data, game.moves.length);
     play(data.col);
     update();
   }, wait);
@@ -126,6 +129,7 @@ function newGame() {
   humanPlayer = document.querySelector('input[name="first"]:checked').value === 'human' ? 1 : 2;
   level = document.querySelector('input[name="level"]:checked').value;
   game.reset();
+  countEl.textContent = '';
   redraw();
   if (humanPlayer === 2) askAI();
 }
@@ -134,6 +138,7 @@ undoBtn.addEventListener('click', () => {
   if (thinking) return;
   if (game.moves.length && (game.moves.length % 2 === 0 ? 2 : 1) !== humanPlayer) game.undo();
   game.undo();
+  countEl.textContent = '';
   redraw();
 });
 
