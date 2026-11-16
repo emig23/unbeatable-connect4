@@ -18,7 +18,12 @@
 
     <section class="play" aria-label="Game">
       <p class="ai-count" id="ai-count" aria-live="polite"></p>
-      <div class="board" id="board" role="group" aria-label="Board, 7 columns. Press 1 to 7 to drop a stone."></div>
+      <div class="board-wrap">
+        <div class="board" id="board" role="group" aria-label="Board, 7 columns. Press 1 to 7 to drop a stone."></div>
+        <button type="button" class="start" id="start" aria-label="Start game">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>
+        </button>
+      </div>
       <p class="status" id="status" role="status" aria-live="polite"></p>
 
       <fieldset class="segmented level">

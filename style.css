@@ -128,6 +128,28 @@ h1 {
 @keyframes drop { from { transform: translateY(calc(var(--fall) * -100% - 40%)); } to { transform: translateY(0); } }
 @keyframes settle { 40% { transform: translateY(-6%); } 100% { transform: translateY(0); } }
  
+.board-wrap { position: relative; width: fit-content; }
+.start {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6rem; height: 6rem;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #22a55a;
+  box-shadow: inset 0 -6px 0 #15803d, 0 6px 18px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  z-index: 2;
+}
+.start svg { width: 52%; height: 52%; margin-left: 8%; fill: #fff; }
+.start:hover { background: #1f9651; }
+.start:active { transform: translate(-50%, -50%) scale(0.96); }
+.start:focus-visible { outline: 4px solid var(--focus); outline-offset: 4px; }
+.start[hidden] { display: none; }
+
 /* ---------- status and controls ---------- */
 .status {
   font-size: 1.35rem;
