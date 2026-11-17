@@ -9,6 +9,7 @@ export function movesUntilWin({ col, method, exact }, m) {
 
 export function winLabel(result, m) {
   const n = movesUntilWin(result, m);
-  if (n === null) return '';
-  return `${n} ${n === 1 ? 'move' : 'moves'} until AI wins`;
+  if (n === null || n <= 1) return '';
+  const left = n - 1;
+  return `${left} ${left === 1 ? 'move' : 'moves'} until AI wins`;
 }

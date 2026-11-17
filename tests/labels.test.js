@@ -15,11 +15,16 @@ test('no count known: empty label', () => {
   }
 });
 
-test('immediate win says 1 move', () => {
-  assert.equal(winLabel({ col: 0, method: 'win' }, 6), '1 move until AI wins');
+test('immediate win needs no label', () => {
+  assert.equal(winLabel({ col: 0, method: 'win' }, 6), '');
 });
 
-// Check the count against real games
+test('label counts the moves left after this one', () => {
+  const exact = [18, null, null, null, null, null, null];
+  assert.equal(winLabel({ col: 0, method: 'solver', exact }, 4), '1 move until AI wins');
+});
+
+// Check the count against real games: play the AI's best line and count moves
 test('the count matches the number of AI moves to the win', () => {
   const solver = new Solver(1048573);
   for (const seq of ['4455', '64365566766442314', '466252652452777175273']) {
@@ -28,7 +33,6 @@ test('the count matches the number of AI moves to the win', () => {
     const best = exact.indexOf(Math.max(...exact.filter(v => v !== null)));
     const n = movesUntilWin({ col: best, method: 'solver', exact }, p.moves);
 
-    // Both sides play perfectly
     const q = p.clone();
     let aiMoves = 0;
     for (;;) {
