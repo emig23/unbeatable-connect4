@@ -11,6 +11,7 @@ Play Connect 4 in your browser against an AI with three difficulty levels. On Un
 - **Moves until the AI wins.** When the AI has solved the game, it says how many moves it needs.
 - **Runs entirely in the browser.** Plain JavaScript, no framework and no server. The AI runs in background threads (Web Workers), so the page never freezes while it thinks.
 - **Works on phones**, with keyboard controls (keys 1 to 7) on desktop.
+- **About box.** An About button at the top right explains the project and links back to this repository.
 
 ## How the AI works
 
