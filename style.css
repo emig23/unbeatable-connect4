@@ -9,7 +9,7 @@
   --ai: #FF0000;         
   --ai-edge: #8B0000;
   --focus: #f0b429;
-  --cell: min(12vw, 76px);
+  --cell: min(11vw, 76px);
 }
 
 * { box-sizing: border-box; }
@@ -24,7 +24,7 @@ body {
 }
  
 main {
-  width: min(100% - 2rem, calc(var(--cell) * 7 + 1.5rem));
+  width: min(100% - 2rem, calc(var(--cell) * 7 + 3rem));
   margin: 0 auto;
   padding: 2.5rem 0 4rem;
 }
@@ -56,6 +56,50 @@ h1 {
 .analysis .good { color: var(--slab); font-weight: 600; }
 .analysis .chosen { color: var(--ink); font-weight: 800; }
 .analysis[hidden] { visibility: hidden; display: grid; }
+/* win chance bar beside the board, and the labels above both */
+.game-grid {
+  display: grid;
+  grid-template-columns: 1rem auto;
+  column-gap: 0.5rem;
+  width: fit-content;
+}
+.win-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: 0.4rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.eval {
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #e8edec;
+  box-shadow: inset 0 0 0 1px rgba(20, 35, 31, 0.15);
+}
+.eval-ai, .eval-draw, .eval-you { position: absolute; left: 0; right: 0; transition: height 0.5s ease, top 0.5s ease; }
+.eval-ai { top: 0; height: 50%; background: var(--ai); }
+.eval-you { bottom: 0; height: 50%; background: var(--you); }
+.eval-draw { top: 50%; height: 0; background: #b9c4c1; }
+.eval-mid { position: absolute; left: 0; right: 0; top: 50%; height: 2px; margin-top: -1px; background: rgba(20, 35, 31, 0.35); }
+.eval-top, .eval-bottom {
+  position: absolute;
+  left: -4px;
+  right: -4px;
+  text-align: center;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+}
+.eval-top { top: 4px; color: #fff; }
+.eval-top.on-light { color: var(--ink); }
+.eval-bottom { bottom: 4px; color: var(--ink); }
+
 .ai-count {
   min-height: 1.5rem;
   margin: 0 0 0.4rem;
@@ -63,9 +107,6 @@ h1 {
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--ink);
-}
-@media (max-width: 560px) {
-  .ai-count { margin-right: 0.5rem; } /* the board has less padding here */
 }
  
 .board {

@@ -1,5 +1,5 @@
 import { Game, COLS, ROWS } from './game.js';
-import { winLabel } from './labels.js';
+import { winLabel, movesUntilWin } from './labels.js';
 
 const boardEl = document.getElementById('board');
 const statusEl = document.getElementById('status');
@@ -12,9 +12,17 @@ const resultEl = document.getElementById('result');
 const resultTitle = document.getElementById('result-title');
 const rainEl = document.getElementById('rain');
 const againBtn = document.getElementById('again');
+const evalEl = document.getElementById('eval');
+const evalAi = document.getElementById('eval-ai');
+const evalDraw = document.getElementById('eval-draw');
+const evalYou = document.getElementById('eval-you');
+const evalTop = document.getElementById('eval-top');
+const evalBottom = document.getElementById('eval-bottom');
 
 const game = new Game();
 const worker = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
+// A second worker works out the win chance, so the AI's moves are never slowed down.
+const statsWorker = new Worker(new URL('./stats-worker.js', import.meta.url), { type: 'module' });
 
 let humanPlayer = 2;   // 1 = moves first
 let thinking = false;
@@ -22,6 +30,7 @@ let requestId = 0;
 let level = 'medium'; // 'easy' | 'medium' | 'unbeatable'
 let askedAt = 0;
 let started = false; // false until the play button is pressed
+let statsId = 0;
 
 // ---------- board ----------
 const columns = [];
@@ -100,6 +109,7 @@ function play(c) {
   const r = game.play(c);
   drawStone(c, r, player, true);
   markWin();
+  updateWinChance();
   if (game.isOver) {
     // Let the last stone land before the result pops up.
     const id = requestId;
@@ -129,7 +139,13 @@ worker.onmessage = ({ data }) => {
     if (data.id !== requestId) return;
     thinking = false;
     countEl.textContent = winLabel(data, game.moves.length);
+    const aiLeft = movesUntilWin(data, game.moves.length) - 1; // below 1 when unknown
     play(data.col);
+    // If the AI already solved the game, the bar shows that right away.
+    if (aiLeft > 0) {
+      statsId++;
+      showWinChance({ ai: 100, draw: 0, you: 0, solved: true, winner: 'ai', moves: aiLeft });
+    }
     update();
   }, wait);
 };
@@ -137,6 +153,45 @@ worker.onmessage = ({ data }) => {
 worker.onerror = () => {
   thinking = false;
   statusEl.textContent = 'The AI failed to load. Reload the page to try again.';
+};
+
+// ---------- win chance bar ----------
+// r = { ai, draw, you } in percents; solved results also carry winner and moves.
+function showWinChance(r, numbers = true) {
+  evalAi.style.height = `${r.ai}%`;
+  evalDraw.style.top = `${r.ai}%`;
+  evalDraw.style.height = `${r.draw}%`;
+  evalYou.style.height = `${r.you}%`;
+  let top = '', bottom = '';
+  if (numbers && r.solved) {
+    // Solved: the winner's end shows how many moves they need, like #7 in chess.
+    if (r.winner === 'ai' && r.moves) top = `#${r.moves}`;
+    if (r.winner === 'you' && r.moves) bottom = `#${r.moves}`;
+  } else if (numbers) {
+    if (r.ai) top = `${r.ai}`;
+    if (r.you) bottom = `${r.you}`;
+  }
+  evalTop.textContent = top;
+  evalBottom.textContent = bottom;
+  evalTop.classList.toggle('on-light', r.ai < 12); // dark text when there's little red behind it
+  evalEl.setAttribute('aria-label', r.solved && r.winner !== 'draw'
+    ? `Win chance: ${r.winner === 'ai' ? 'AI' : 'you'} win${r.winner === 'ai' ? 's' : ''} with perfect play`
+    : `Win chance: AI ${r.ai}%, draw ${r.draw}%, you ${r.you}%`);
+}
+
+function updateWinChance() {
+  statsId++;
+  if (!started) { showWinChance({ ai: 50, draw: 0, you: 50 }, false); return; }
+  if (game.isOver) {
+    const w = game.isDraw ? 'draw' : game.winner === humanPlayer ? 'you' : 'ai';
+    showWinChance({ ai: w === 'ai' ? 100 : 0, draw: w === 'draw' ? 100 : 0, you: w === 'you' ? 100 : 0 }, false);
+    return;
+  }
+  statsWorker.postMessage({ id: statsId, moves: game.moves, level, humanPlayer });
+}
+
+statsWorker.onmessage = ({ data }) => {
+  if (data.id === statsId) showWinChance(data); // ignore answers for older positions
 };
 
 // ---------- result popup ----------
@@ -186,6 +241,7 @@ function newGame() {
   game.reset();
   countEl.textContent = '';
   redraw();
+  updateWinChance();
 }
 
 function startGame() {
@@ -194,6 +250,7 @@ function startGame() {
   started = true;
   startBtn.hidden = true;
   update();
+  updateWinChance();
   if (humanPlayer === 2) askAI();
 }
 
@@ -203,6 +260,7 @@ undoBtn.addEventListener('click', () => {
   game.undo();
   countEl.textContent = '';
   redraw();
+  updateWinChance();
 });
 
 newBtn.addEventListener('click', newGame);
