@@ -14,7 +14,6 @@ const book = fetch(new URL('./book.json', import.meta.url))
 
 self.onmessage = async ({ data }) => {
   if (data.type !== 'move') return;
-  const t = performance.now();
   let result;
   if (data.level === 'unbeatable') {
     // ~4M-entry transposition table (~20 MB).
@@ -23,5 +22,5 @@ self.onmessage = async ({ data }) => {
   } else {
     result = basic.chooseMove(data.moves, LEVELS[data.level] ?? LEVELS.medium);
   }
-  self.postMessage({ id: data.id, ...result, ms: Math.round(performance.now() - t) });
+  self.postMessage({ id: data.id, ...result });
 };

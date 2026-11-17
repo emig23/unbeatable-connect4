@@ -92,7 +92,6 @@ function update() {
   undoBtn.disabled = thinking || !game.moves.split('').some((_, i) => i % 2 === humanPlayer - 1);
   markNext();
 
-  statusEl.classList.toggle('thinking', thinking);
   if (!started) statusEl.textContent = 'Press play to start';
   else if (game.winner) statusEl.textContent = game.winner === humanPlayer ? 'You win. Well played.' : 'AI wins.';
   else if (game.isDraw) statusEl.textContent = 'Draw.';

@@ -5,7 +5,6 @@ export const HEIGHT = 6;
 const H1 = HEIGHT + 1;
 const CELLS = WIDTH * HEIGHT;
 export const MIN_SCORE = -(CELLS / 2) + 3; // -18
-export const MAX_SCORE = ((CELLS + 1) >> 1) - 3; // 18
 
 const LO_MASK = 0x0fffffff; // 28 bits
 const HI_MASK = 0x1fffff; // 21 bits
@@ -131,8 +130,6 @@ export class Position {
     return k;
   }
   key() { return this.keyHi() * 2 ** 28 + this.keyLo(); }
-  // Key that is the same for a position and its mirror image.
-  symKey() { return Math.min(this.key(), this.mirrorKey()); }
 }
 
 // ---- Transposition table ----

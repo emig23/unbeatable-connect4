@@ -41,21 +41,6 @@ h1 {
 .lede { margin: 0 0 2rem; color: var(--muted); max-width: 34em; }
  
 /* ---------- board ---------- */
-.analysis {
-  width: fit-content;
-  display: grid;
-  grid-template-columns: repeat(7, var(--cell));
-  padding: 0 0.75rem;
-  min-height: 2.6rem;
-  font-size: 0.78rem;
-  line-height: 1.15;
-  text-align: center;
-  color: var(--muted);
-}
-.analysis span { align-self: end; padding: 0 2px 0.4rem; }
-.analysis .good { color: var(--slab); font-weight: 600; }
-.analysis .chosen { color: var(--ink); font-weight: 800; }
-.analysis[hidden] { visibility: hidden; display: grid; }
 /* win chance bar beside the board, and the labels above both */
 .game-grid {
   display: grid;
@@ -182,7 +167,6 @@ h1 {
 .stone.p-ai  { background: var(--ai);  box-shadow: inset 0 -4px 0 var(--ai-edge); }
 .stone.drop { animation: drop var(--t, 300ms) cubic-bezier(0.5, 0, 0.75, 0) both, settle 160ms ease-out var(--t, 300ms); }
 .stone.win { outline: 4px solid var(--ink); outline-offset: 3px; }
-.stone.p-you.win { outline-color: var(--ink); }
 .stone.p-ai.win { outline-color: var(--you); }
  
 @keyframes drop { from { transform: translateY(calc(var(--fall) * -100% - 40%)); } to { transform: translateY(0); } }
@@ -233,7 +217,6 @@ h1 {
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
-.turn .status.thinking::after { display: none; }
 .turn-stone {
   width: 1.5rem;
   height: 1.5rem;
@@ -249,22 +232,6 @@ h1 {
 }
 
 /* ---------- status and controls ---------- */
-.status {
-  font-size: 1.35rem;
-  font-weight: 600;
-  margin: 1.1rem 0 1rem;
-  min-height: 2rem;
-}
-.status.thinking::after {
-  content: "";
-  display: inline-block;
-  width: 0.6em; height: 0.6em;
-  margin-left: 0.5em;
-  border-radius: 50%;
-  background: var(--ai);
-  box-shadow: inset 0 -2px 0 var(--ai-edge);
-  animation: pulse 900ms ease-in-out infinite alternate;
-}
 @keyframes pulse { to { transform: translateY(-4px); } }
  
 .controls { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
@@ -303,19 +270,9 @@ fieldset.segmented label { white-space: nowrap; }
 .controls button:disabled { opacity: 0.45; cursor: default; }
 .controls button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
  
-.toggle { display: inline-flex; gap: 0.5rem; margin-top: 1rem; font-size: 0.95rem; color: var(--muted); cursor: pointer; }
-.toggle input { accent-color: var(--slab); }
- 
-/* ---------- about ---------- */
-.about { margin-top: 3.5rem; max-width: 36em; }
-.about h2 { font-size: 1.25rem; margin: 0 0 0.5rem; }
-.about p { margin: 0 0 0.8rem; color: var(--muted); }
-.about a { color: var(--ink); font-weight: 600; }
- 
 @media (max-width: 560px) {
   main { padding-top: 1.5rem; }
   .board { padding: 0.5rem; border-radius: 14px; }
-  .analysis { padding: 0 0.5rem; font-size: 0.68rem; }
   .controls button.primary { margin-left: 0; }
   /* Easy / Medium / Unbeatable explain themselves; keep the legend for
      screen readers only so the pill fits on narrow screens. */
@@ -328,7 +285,6 @@ fieldset.segmented label { white-space: nowrap; }
  
 @media (prefers-reduced-motion: reduce) {
   .stone.drop { animation: none; }
-  .status.thinking::after { animation: none; }
 }
 
 /* ---------- result popup ---------- */
