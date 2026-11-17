@@ -270,3 +270,90 @@ fieldset.segmented label { white-space: nowrap; }
   .stone.drop { animation: none; }
   .status.thinking::after { animation: none; }
 }
+
+/* ---------- result popup ---------- */
+.result {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  background: rgba(20, 35, 31, 0.35);
+  overflow: hidden;
+}
+.result[hidden] { display: none; }
+
+/* stones falling through the background, entering at the top and leaving at the bottom */
+.rain span {
+  position: absolute;
+  top: -4rem;
+  width: var(--s);
+  height: var(--s);
+  border-radius: 50%;
+  animation: rain var(--d) linear var(--delay) infinite;
+}
+.rain span.you { background: var(--you); box-shadow: inset 0 -3px 0 var(--you-edge); }
+.rain span.ai { background: var(--ai); box-shadow: inset 0 -3px 0 var(--ai-edge); }
+
+.big-stone,
+.result-ring {
+  grid-area: 1 / 1;
+  width: min(72vw, 17rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+.big-stone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  animation: big-drop 0.6s cubic-bezier(0.5, 0, 0.75, 0) both, big-bounce 0.35s ease-out 0.6s;
+}
+.result.win .big-stone { background: var(--you); color: var(--ink); box-shadow: inset 0 -12px 0 var(--you-edge), 0 18px 40px rgba(0, 0, 0, 0.3); }
+.result.lose .big-stone { background: var(--ai); color: #fff; box-shadow: inset 0 -12px 0 var(--ai-edge), 0 18px 40px rgba(0, 0, 0, 0.3); }
+.result.draw .big-stone { background: linear-gradient(90deg, var(--you) 50%, var(--ai) 50%); color: var(--ink); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.3); }
+
+.result-title {
+  margin: 0;
+  font-size: clamp(2rem, 9vw, 2.75rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.again {
+  font: inherit;
+  font-weight: 600;
+  padding: 0.55rem 1.3rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--slab);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  animation: fade-in 0.3s ease-out 0.9s forwards;
+}
+.again:hover { background: var(--slab-edge); }
+.again:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+/* win: golden rings pulse out from the stone */
+.result-ring { border: 6px solid var(--you); opacity: 0; }
+.result.win .result-ring { animation: ring 1s ease-out 0.6s 3; }
+
+/* loss: the page shakes when the stone lands and the board goes grey */
+body.lost main { animation: shake 0.45s ease-in-out 0.6s; }
+body.lost .board { filter: grayscale(0.85) brightness(0.8); transition: filter 0.5s; }
+
+@keyframes rain { to { transform: translateY(calc(100vh + 8rem)); } }
+@keyframes big-drop { from { transform: translateY(-100vh); } to { transform: translateY(0); } }
+@keyframes big-bounce { 40% { transform: translateY(-1.2rem); } 100% { transform: translateY(0); } }
+@keyframes ring { from { opacity: 0.9; transform: scale(1); } to { opacity: 0; transform: scale(1.6); } }
+@keyframes fade-in { to { opacity: 1; } }
+@keyframes shake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .rain { display: none; }
+  .big-stone, .result-ring, body.lost main { animation: none; }
+  .again { animation: none; opacity: 1; }
+}

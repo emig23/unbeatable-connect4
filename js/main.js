@@ -8,6 +8,10 @@ const undoBtn = document.getElementById('undo');
 const newBtn = document.getElementById('new');
 const countEl = document.getElementById('ai-count');
 const startBtn = document.getElementById('start');
+const resultEl = document.getElementById('result');
+const resultTitle = document.getElementById('result-title');
+const rainEl = document.getElementById('rain');
+const againBtn = document.getElementById('again');
 
 const game = new Game();
 const worker = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
@@ -96,6 +100,11 @@ function play(c) {
   const r = game.play(c);
   drawStone(c, r, player, true);
   markWin();
+  if (game.isOver) {
+    // Let the last stone land before the result pops up.
+    const id = requestId;
+    setTimeout(() => { if (id === requestId) showResult(); }, 700);
+  }
 }
 
 function humanMove(c) {
@@ -130,6 +139,42 @@ worker.onerror = () => {
   statusEl.textContent = 'The AI failed to load. Reload the page to try again.';
 };
 
+// ---------- result popup ----------
+function showResult() {
+  const outcome = game.isDraw ? 'draw' : game.winner === humanPlayer ? 'win' : 'lose';
+  resultTitle.textContent = outcome === 'win' ? 'You win!' : outcome === 'lose' ? 'AI wins' : 'Draw';
+  resultEl.className = `result ${outcome}`;
+  document.body.classList.toggle('lost', outcome === 'lose');
+
+  // Stones of the winner's color fall through the screen, over and over.
+  const colors = outcome === 'win' ? ['you'] : outcome === 'lose' ? ['ai'] : ['you', 'ai'];
+  rainEl.replaceChildren();
+  for (let i = 0; i < 28; i++) {
+    const drop = document.createElement('span');
+    drop.className = colors[i % colors.length];
+    drop.style.left = `${Math.random() * 100}%`;
+    drop.style.setProperty('--s', `${1.5 + Math.random() * 2}rem`);
+    drop.style.setProperty('--d', `${2.5 + Math.random() * 2.5}s`);
+    drop.style.setProperty('--delay', `${Math.random() * 3}s`);
+    rainEl.append(drop);
+  }
+
+  resultEl.hidden = false;
+  againBtn.focus({ preventScroll: true });
+}
+
+function hideResult() {
+  resultEl.hidden = true;
+  rainEl.replaceChildren();
+  document.body.classList.remove('lost');
+}
+
+// Play again: same settings, new game right away.
+againBtn.addEventListener('click', () => {
+  newGame();
+  startGame();
+});
+
 // ---------- controls ----------
 // New game, or a changed setting: clear the board and wait for the play button.
 function newGame() {
@@ -137,6 +182,7 @@ function newGame() {
   thinking = false;
   started = false;
   startBtn.hidden = false;
+  hideResult();
   game.reset();
   countEl.textContent = '';
   redraw();
