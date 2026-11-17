@@ -18,6 +18,7 @@ const evalDraw = document.getElementById('eval-draw');
 const evalYou = document.getElementById('eval-you');
 const evalTop = document.getElementById('eval-top');
 const evalBottom = document.getElementById('eval-bottom');
+const evalSpinner = document.getElementById('eval-spinner');
 
 const game = new Game();
 const worker = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
@@ -158,6 +159,7 @@ worker.onerror = () => {
 // ---------- win chance bar ----------
 // r = { ai, draw, you } in percents; solved results also carry winner and moves.
 function showWinChance(r, numbers = true) {
+  evalSpinner.hidden = true;
   evalAi.style.height = `${r.ai}%`;
   evalDraw.style.top = `${r.ai}%`;
   evalDraw.style.height = `${r.draw}%`;
@@ -188,6 +190,7 @@ function updateWinChance() {
     return;
   }
   statsWorker.postMessage({ id: statsId, moves: game.moves, level, humanPlayer });
+  evalSpinner.hidden = false; // until the answer for this position arrives
 }
 
 statsWorker.onmessage = ({ data }) => {
