@@ -39,6 +39,39 @@ h1 {
 }
  
 .lede { margin: 0 0 2rem; color: var(--muted); max-width: 34em; }
+
+/* title on the left, About button on the right */
+.masthead { display: grid; grid-template-columns: 1fr auto; column-gap: 1rem; align-items: start; }
+.masthead .lede { grid-column: 1 / -1; }
+.about-btn {
+  grid-column: 2;
+  grid-row: 1;
+  margin-top: 0.35rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.35rem 0.9rem 0.35rem 0.7rem;
+  border: 2px solid var(--slab);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--slab);
+  cursor: pointer;
+}
+.about-btn svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
+.about-btn:hover { background: var(--slab); color: #fff; }
+.about-btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+/* on phones, just the icon, so the title fits on one line */
+@media (max-width: 560px) {
+  .about-btn { padding: 0.4rem; }
+  .about-btn svg { width: 1.3em; height: 1.3em; }
+  .about-label {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap;
+  }
+}
  
 /* ---------- board ---------- */
 /* win chance bar beside the board, and the labels above both */
@@ -372,4 +405,69 @@ body.lost .board { filter: grayscale(0.85) brightness(0.8); transition: filter 0
   .rain { display: none; }
   .big-stone, .result-ring, body.lost main { animation: none; }
   .again { animation: none; opacity: 1; }
+}
+
+/* ---------- about box ---------- */
+.about {
+  width: min(92vw, 28rem);
+  max-height: min(85vh, 40rem);
+  padding: 0;
+  border: 0;
+  border-radius: 20px;
+  background: #f7faf9;
+  color: var(--ink);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  overflow: auto;
+}
+.about::backdrop { background: rgba(20, 35, 31, 0.45); backdrop-filter: blur(3px); }
+.about[open] { animation: about-in 0.25s ease-out; }
+@keyframes about-in { from { opacity: 0; transform: translateY(12px) scale(0.97); } }
+.about-box { position: relative; padding: 1.5rem 1.6rem 1.6rem; }
+.about-close {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #e3eae8;
+  color: var(--slab);
+  cursor: pointer;
+}
+.about-close svg { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+.about-close:hover { background: #cfd9d6; }
+.about-close:focus-visible, .about-github:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.about h2 { margin: 0 2.5rem 0.25rem 0; font-size: 1.4rem; font-weight: 800; letter-spacing: -0.01em; }
+.about-tag { margin: 0; color: var(--muted); font-size: 0.95rem; line-height: 1.5; }
+.about h3 { margin: 1.1rem 0 0.4rem; font-size: 0.85rem; font-weight: 700; }
+.about ul, .about dl { margin: 0; font-size: 0.85rem; line-height: 1.55; color: #33453f; }
+.about ul { padding-left: 1.15rem; }
+.about li { margin: 0.2rem 0; }
+.about-levels { display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 0.8rem; }
+.about-levels dt { font-weight: 700; color: var(--ink); }
+.about-levels dd { margin: 0; }
+.about .about-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0; list-style: none; }
+.about-chips li { margin: 0; padding: 0.15rem 0.65rem; border-radius: 999px; background: #e3eae8; color: var(--slab); font-size: 0.8rem; }
+.about-github {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.4rem;
+  padding: 0.6rem 0;
+  border-radius: 999px;
+  background: var(--slab);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+.about-github svg { width: 1.1rem; height: 1.1rem; fill: currentColor; }
+.about-github:hover { background: var(--slab-edge); }
+@media (prefers-reduced-motion: reduce) {
+  .about[open] { animation: none; }
 }

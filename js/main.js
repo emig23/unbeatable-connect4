@@ -19,6 +19,9 @@ const evalYou = document.getElementById('eval-you');
 const evalTop = document.getElementById('eval-top');
 const evalBottom = document.getElementById('eval-bottom');
 const evalSpinner = document.getElementById('eval-spinner');
+const aboutBtn = document.getElementById('about-btn');
+const aboutEl = document.getElementById('about');
+const aboutClose = document.getElementById('about-close');
 
 const game = new Game();
 const worker = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
@@ -269,8 +272,15 @@ newBtn.addEventListener('click', newGame);
 startBtn.addEventListener('click', startGame);
 document.querySelectorAll('input[name="first"], input[name="level"]').forEach(i => i.addEventListener('change', newGame));
 
+// ---------- about box ----------
+// A native <dialog>: Esc closes it and the page behind can't be clicked while it's open.
+aboutBtn.addEventListener('click', () => aboutEl.showModal());
+aboutClose.addEventListener('click', () => aboutEl.close());
+aboutEl.addEventListener('click', e => { if (e.target === aboutEl) aboutEl.close(); }); // click outside the box
+
 document.addEventListener('keydown', e => {
   if (e.altKey || e.ctrlKey || e.metaKey) return;
+  if (aboutEl.open) return; // don't play moves while reading the about box
   const n = Number(e.key);
   if (n >= 1 && n <= COLS) humanMove(n - 1);
 });
